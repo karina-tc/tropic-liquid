@@ -212,26 +212,28 @@ const actions = [
   });
 
   input?.addEventListener('input', (e: Event) => {
-    const target = e.target as HTMLInputElement;
-    const value = target?.value.toLowerCase();
-    let hasVisibleItems = false;
-    const actionItems = document.querySelectorAll('[data-label]');
-    actionItems.forEach((item: Element) => {
-      const label = item.getAttribute('data-label') || '';
-      if (label.toLowerCase().includes(value)) {
-        item.classList.remove('hidden');
-        hasVisibleItems = true;
-      } else {
-        item.classList.add('hidden');
-      }
-    });
-    const seeAllLink = document.querySelector('.see-all-link');
-    if (!hasVisibleItems && seeAllLink) {
-      seeAllLink.classList.remove('hidden');
-    } else if (seeAllLink) {
-      seeAllLink.classList.add('hidden');
+  const target = e.target as HTMLInputElement;
+  const value = target?.value.toLowerCase();
+  let hasVisibleItems = false;
+  const actionItems = document.querySelectorAll('[data-label]');
+  const seeAllLink = document.querySelector('.see-all');
+
+  actionItems.forEach((item: Element) => {
+    const label = item.getAttribute('data-label') || '';
+    if (label.includes(value)) {
+      item.classList.remove('hidden');
+      hasVisibleItems = true;
+    } else {
+      item.classList.add('hidden');
     }
   });
+
+  if (!hasVisibleItems && value) {
+    seeAllLink?.classList.remove('hidden');
+  } else {
+    seeAllLink?.classList.add('hidden');
+  }
+});
 
   // Close menu when clicking outside
   document.addEventListener('click', (e) => {
@@ -242,7 +244,7 @@ const actions = [
     }
   });
   // Handle "See All" click
-  const seeAllLink = document.querySelector('.see-all-link');
+  const seeAllLink = document.querySelector('.see-all');
   const actionItems = document.querySelectorAll('[data-label]');
   seeAllLink?.addEventListener('click', (e: Event) => {
     e.preventDefault();
