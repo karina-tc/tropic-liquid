@@ -44,11 +44,15 @@ const actions = [
             <path d="M14.1531 0.616272H1.84684C1.52045 0.616272 1.20744 0.745927 0.976653 0.976714C0.745866 1.2075 0.616211 1.52051 0.616211 1.8469V14.1531C0.616211 14.4795 0.745866 14.7925 0.976653 15.0233C1.20744 15.2541 1.52045 15.3838 1.84684 15.3838H14.1531C14.4795 15.3838 14.7925 15.2541 15.0233 15.0233C15.2541 14.7925 15.3837 14.4795 15.3837 14.1531V1.8469C15.3837 1.52051 15.2541 1.2075 15.0233 0.976714C14.7925 0.745927 14.4795 0.616272 14.1531 0.616272ZM14.1531 14.1531H1.84684V1.8469H14.1531V14.1531ZM11.6918 8.00002C11.6918 8.16321 11.627 8.31972 11.5116 8.43511C11.3962 8.55051 11.2397 8.61533 11.0765 8.61533H8.61527V11.0766C8.61527 11.2398 8.55045 11.3963 8.43505 11.5117C8.31966 11.6271 8.16315 11.6919 7.99996 11.6919C7.83677 11.6919 7.68026 11.6271 7.56487 11.5117C7.44948 11.3963 7.38465 11.2398 7.38465 11.0766V8.61533H4.9234C4.76021 8.61533 4.6037 8.55051 4.48831 8.43511C4.37291 8.31972 4.30809 8.16321 4.30809 8.00002C4.30809 7.83683 4.37291 7.68032 4.48831 7.56493C4.6037 7.44954 4.76021 7.38471 4.9234 7.38471H7.38465V4.92346C7.38465 4.76027 7.44948 4.60376 7.56487 4.48837C7.68026 4.37297 7.83677 4.30815 7.99996 4.30815C8.16315 4.30815 8.31966 4.37297 8.43505 4.48837C8.55045 4.60376 8.61527 4.76027 8.61527 4.92346V7.38471H11.0765C11.2397 7.38471 11.3962 7.44954 11.5116 7.56493C11.627 7.68032 11.6918 7.83683 11.6918 8.00002Z" fill="#7C7C7C"/>
           </svg>            
         </button>
-        <button>
-          /
-        </button>
-        <button class="w-6 h-6 rounded-full bg-black text-white ml-auto">
-          —
+        <shortcut class="shortcut">
+          <span id="shortcutKey">K</span>
+        </shortcut>
+        <button class="submit-button">
+          <svg width="16" height="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+            <rect width="256" height="256" fill="none"/>
+            <line x1="40" y1="128" x2="216" y2="128" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/>
+            <polyline points="144 56 216 128 144 200" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/>
+          </svg>
         </button>
       </div>
     </div>
@@ -111,6 +115,17 @@ const actions = [
 
   .icon {
     @apply text-gray-400 w-5 h-5 absolute inset-0 top-2 left-3 z-[1];
+  }
+
+  .shortcut {
+    @apply flex items-center justify-center px-2
+    min-w-6 bg-gray-50 border border-gray-100 rounded-sm
+    text-sm text-gray-500;
+  }
+
+  .submit-button {
+    @apply w-6 h-6 rounded-full bg-black text-white 
+    ml-auto flex items-center justify-center;
   }
 
   .search-input {
@@ -197,10 +212,18 @@ const actions = [
   const input = document.querySelector('.search-input');
   const wrapper = document.querySelector('.input-wrapper');
   const actionMenu = document.getElementById('actionMenu');
+  const shortcutKey = document.getElementById('shortcutKey');
+  const shortcut = document.querySelector('.shortcut');
+  const submitButton = document.querySelector('.submit-button');
+
+  // Hide submit button initially
+  submitButton?.classList.add('hidden');
 
   input?.addEventListener('focus', () => {
     actionMenu?.classList.remove('hidden');
     wrapper?.classList.add('focused');
+    shortcut?.classList.add('hidden');
+    submitButton?.classList.remove('hidden');
   });
 
   document.addEventListener('click', (e) => {
@@ -208,6 +231,44 @@ const actions = [
     if (!target?.closest('.search-container')) {
       actionMenu?.classList.add('hidden');
       wrapper?.classList.remove('focused');
+      shortcut?.classList.remove('hidden');
+      submitButton?.classList.add('hidden');
+      if (input instanceof HTMLInputElement) {
+        input.value = '';
+      }
+      // Reset visibility of action items
+      const actionItems = document.querySelectorAll('[data-label]');
+      actionItems.forEach((item: Element) => item.classList.remove('hidden'));
+      document.querySelector('.see-all')?.classList.add('hidden');
+    }
+  });
+  const isMac = navigator.platform.toLowerCase().includes('mac');
+
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey && isMac || e.ctrlKey && !isMac) && e.key.toLowerCase() === 'k') {
+      e.preventDefault();
+      if (input instanceof HTMLElement) {
+        input.focus();
+      }
+      actionMenu?.classList.remove('hidden');
+      wrapper?.classList.add('focused');
+      shortcut?.classList.add('hidden');
+      submitButton?.classList.remove('hidden');
+    }
+    
+    if (e.key === 'Escape') {
+      actionMenu?.classList.add('hidden');
+      wrapper?.classList.remove('focused');
+      shortcut?.classList.remove('hidden');
+      submitButton?.classList.add('hidden');
+      if (input instanceof HTMLInputElement) {
+        input.value = '';
+        input.blur();
+      }
+      // Reset visibility of action items
+      const actionItems = document.querySelectorAll('[data-label]');
+      actionItems.forEach((item: Element) => item.classList.remove('hidden'));
+      document.querySelector('.see-all')?.classList.add('hidden');
     }
   });
 
@@ -241,6 +302,7 @@ const actions = [
     if (!target?.closest('.search-container')) {
       actionMenu?.classList.add('hidden');
       wrapper?.classList.remove('focused');
+      shortcut?.classList.remove('hidden');
     }
   });
   // Handle "See All" click
